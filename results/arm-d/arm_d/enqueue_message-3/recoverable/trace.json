@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "local_execution_bound",
+  "origin": "constructed_arm_d",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "tool: enqueue_message, target: primary-item-3, value: summary-3, ticket: t0, policy_version: v1, max_uses_per_action: 1, actions: [tool: enqueue_message, target: primary-item-3, value: summary-3, ticket: t0], current_policy_version: v1, context: recoverable, blocked_target: primary-item-3"
+  }
+}

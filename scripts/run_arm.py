@@ -141,6 +141,13 @@ def main() -> int:
     )
     ap.add_argument("--model", default=None, help="model name for the chosen backend")
     ap.add_argument("--host", default=None, help="ollama host")
+    ap.add_argument(
+        "--timeout",
+        type=int,
+        default=900,
+        help="per-call model timeout in seconds (CPU inference of long "
+        "verification outputs can exceed the old 300s default)",
+    )
     ap.add_argument("--limit", type=int, default=None, help="run only the first N scenarios")
     a = ap.parse_args()
 
@@ -179,7 +186,7 @@ def main() -> int:
 
     # --- Backend ---
     if a.backend == "ollama":
-        backend = OllamaBackend(model=a.model, host=a.host)
+        backend = OllamaBackend(model=a.model, host=a.host, timeout=a.timeout)
         provenance = backend.identify()
     else:
         backend = MockBackend(default='{"decision":"stop"}')

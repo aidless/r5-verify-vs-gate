@@ -1,0 +1,29 @@
+{
+  "events": [
+    {
+      "action": {
+        "decision": "act",
+        "target": "item-3",
+        "ticket": "t0",
+        "tool": "enqueue_message",
+        "value": "summary-3",
+        "verification": "tool: enqueue_message, target: item-3, value: summary-3, current policy version: v1, checked against permission: authorized=true, max_uses_per_action=1, actions: [tool: enqueue_message, target: item-3, value: summary-3, ticket: t0], consistency: true"
+      },
+      "claimed_success": true,
+      "execution_allowed": true,
+      "operation_error": null,
+      "reason": "bound_allow",
+      "review_allowed": true
+    }
+  ],
+  "guard": "local_execution_bound",
+  "origin": "constructed_arm_d",
+  "reviewed_action": {
+    "decision": "act",
+    "target": "item-3",
+    "ticket": "t0",
+    "tool": "enqueue_message",
+    "value": "summary-3",
+    "verification": "tool: enqueue_message, target: item-3, value: summary-3, current policy version: v1, checked against permission: authorized=true, max_uses_per_action=1, actions: [tool: enqueue_message, target: item-3, value: summary-3, ticket: t0], consistency: true"
+  }
+}

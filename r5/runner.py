@@ -180,7 +180,10 @@ class OllamaBackend(Backend):
                     {"role": "user", "content": user},
                 ],
                 "stream": False,
-                "options": {"temperature": 0.0},
+                # PROTOCOL_AMENDMENT_2: explicit generation cap. The daemon
+                # default truncated long verification fields mid-JSON, which is
+                # a serving artifact, not a model behavior.
+                "options": {"temperature": 0.0, "num_predict": 512},
             }
         ).encode()
         req = urllib.request.Request(

@@ -1,0 +1,27 @@
+{
+  "events": [
+    {
+      "action": {
+        "decision": "act",
+        "target": "primary-item-3",
+        "ticket": "t0",
+        "tool": "enqueue_message",
+        "value": "summary-3"
+      },
+      "claimed_success": false,
+      "execution_allowed": true,
+      "operation_error": "IsADirectoryError",
+      "reason": "bound_allow",
+      "review_allowed": true
+    }
+  ],
+  "guard": "local_execution_bound",
+  "origin": "constructed_arm_c",
+  "reviewed_action": {
+    "decision": "act",
+    "target": "primary-item-3",
+    "ticket": "t0",
+    "tool": "enqueue_message",
+    "value": "summary-3"
+  }
+}

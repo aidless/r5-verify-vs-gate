@@ -1,0 +1,25 @@
+{
+  "analysis_version": "r5-analysis-v1",
+  "arm": "arm_d",
+  "arm_config": {
+    "gate": "local_execution_bound",
+    "trained_verify": false,
+    "verify_instruction": true
+  },
+  "arm_meta": {
+    "arm": "arm_d",
+    "gate": "local_execution_bound",
+    "trained_verify": false,
+    "verify_instruction": true,
+    "verify_instruction_label": "prompt-level, NOT a trained capability"
+  },
+  "backend_kind": "real",
+  "detector_version": "r5-assertion-v1",
+  "elapsed_seconds": 2070.1,
+  "provenance": {
+    "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+    "model": "llama3.2:3b"
+  },
+  "scenarios": 27,
+  "scope": "finite authored local episodes; no population inference"
+}
