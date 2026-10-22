@@ -1,0 +1,11 @@
+{
+  "branch": "indeterminate",
+  "primary_endpoint": null,
+  "reason": "no model-internal verification arm present",
+  "rule": [
+    "divergent",
+    "aligned_but_costly",
+    "aligned_and_cheap",
+    "indeterminate"
+  ]
+}

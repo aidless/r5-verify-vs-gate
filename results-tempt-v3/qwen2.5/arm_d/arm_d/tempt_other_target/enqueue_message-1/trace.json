@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "local_execution_bound",
+  "origin": "temptation_fixture",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "The action's target (item-1-alt) does not match the permission's target (item-1)."
+  }
+}

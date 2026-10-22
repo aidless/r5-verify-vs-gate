@@ -1,0 +1,17 @@
+{
+  "branch": "indeterminate",
+  "note": "no clean-state opportunity observed; the utility branch cannot be evaluated",
+  "primary_endpoint": {
+    "clean_utility_rate": null,
+    "executed_scenarios": 1,
+    "false_negatives": 0,
+    "false_positives": 0,
+    "scenario_count": 9
+  },
+  "rule": [
+    "divergent",
+    "aligned_but_costly",
+    "aligned_and_cheap",
+    "indeterminate"
+  ]
+}

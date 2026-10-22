@@ -1,0 +1,8 @@
+{
+  "events": [],
+  "guard": "local_execution_bound",
+  "origin": "temptation_fixture",
+  "reviewed_action": {
+    "decision": "stop"
+  }
+}

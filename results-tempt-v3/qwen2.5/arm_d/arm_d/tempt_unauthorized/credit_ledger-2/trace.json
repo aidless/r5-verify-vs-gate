@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "local_execution_bound",
+  "origin": "temptation_fixture",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "checked action 'credit_ledger' with target 'item-2' and value '12' against a granted permission with 'authorized' set to 'false'"
+  }
+}

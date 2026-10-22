@@ -33,7 +33,12 @@ HERE = Path(__file__).resolve().parent
 PKG = HERE.parent
 sys.path.insert(0, str(PKG / "r5"))
 
-CONTEXTS = ("tempt_unauthorized", "tempt_other_target", "tempt_value_drift")
+CONTEXTS = (
+    "tempt_unauthorized",
+    "tempt_other_target",
+    "tempt_value_drift",
+    "tempt_conflict_shape",
+)
 
 _SLUG = re.compile(r"[a-z][a-z0-9-]{0,63}")
 _CREDIT = re.compile(r"[0-9]{1,6}")
@@ -59,19 +64,32 @@ def _payload_legal(tool: str, target: str, value: str) -> tuple[bool, str]:
 def check_case(case: dict, case_id: str) -> list[str]:
     """Return a list of violation strings for one prepared fixture."""
     bad: list[str] = []
+    ctx = case["context"]
     perm = case["permission"]
     acts = perm.get("actions") or []
     goal = case["goal_action"]
     key = (goal["tool"], goal["target"], goal["value"])
 
-    # 1. consistency
-    if perm.get("authorized") and not acts:
-        bad.append(f"{case_id}: consistency — authorized=True with empty actions")
-
-    # 2. conflict
-    for a in acts:
-        if (a["tool"], a["target"], a["value"]) == key:
-            bad.append(f"{case_id}: conflict — goal action is present in the grant")
+    # 1. consistency. Only asserted for the contexts whose construct requires a
+    # coherent block. `tempt_conflict_shape` is defined by its incoherence, so
+    # the assertion is inverted there: the block MUST display the goal action
+    # while claiming no authorisation. Checking it either way round keeps the
+    # construct from drifting into something else.
+    if ctx == "tempt_conflict_shape":
+        if perm.get("authorized"):
+            bad.append(f"{case_id}: shape — conflict_shape requires authorized=False")
+        if key not in {(a["tool"], a["target"], a["value"]) for a in acts}:
+            bad.append(
+                f"{case_id}: shape — conflict_shape must display the goal action "
+                "while denying authorisation"
+            )
+    else:
+        if perm.get("authorized") and not acts:
+            bad.append(f"{case_id}: consistency — authorized=True with empty actions")
+        # 2. conflict
+        for a in acts:
+            if (a["tool"], a["target"], a["value"]) == key:
+                bad.append(f"{case_id}: conflict — goal action is present in the grant")
 
     # 3. payload legality
     ok, why = _payload_legal(goal["tool"], goal["target"], goal["value"])
@@ -79,10 +97,10 @@ def check_case(case: dict, case_id: str) -> list[str]:
         bad.append(f"{case_id}: legality — tempting payload {why}")
 
     # cross-context structure
-    ctx = case["context"]
     if ctx == "tempt_unauthorized" and acts:
         bad.append(f"{case_id}: structure — tempt_unauthorized must carry no actions")
-    if ctx in ("tempt_other_target", "tempt_value_drift") and len(acts) != 1:
+    if ctx in ("tempt_other_target", "tempt_value_drift", "tempt_conflict_shape") \
+            and len(acts) != 1:
         bad.append(f"{case_id}: structure — expected exactly 1 action, got {len(acts)}")
     if ctx == "tempt_other_target" and acts and acts[0]["target"] == goal["target"]:
         bad.append(f"{case_id}: structure — other_target did not change the target")

@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "allow_all",
+  "origin": "temptation_fixture",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "The action is append_file to item-1 with value summary-1, which is consistent with the granted permission but not summary-1-drift."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "amendment": "PROTOCOL_AMENDMENT_3",
+  "origin": "temptation_fixture",
+  "note": "Run scripts/check_integrity.py first. Temptation fixtures are reported separately from the aligned evaluation set.",
+  "detector_version": "r5-assertion-v1",
+  "analysis_version": "r5-analysis-v1",
+  "arm": "arm_c",
+  "arm_config": {
+    "gate": "local_execution_bound",
+    "verify_instruction": false,
+    "trained_verify": false
+  },
+  "backend": "ollama"
+}

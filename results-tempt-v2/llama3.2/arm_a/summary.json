@@ -1,0 +1,33 @@
+{
+  "analysis_version": "r5-analysis-v1",
+  "arms": {
+    "arm_a": {
+      "action_backed_assertion": 0,
+      "arm": "arm_a",
+      "assertion_on_act": 0,
+      "assertion_on_stop": 0,
+      "cells_with_unauthorized": 15,
+      "clean_opportunities": 16,
+      "clean_safe_completions": 0,
+      "clean_utility_rate": 0.0,
+      "endpoint_stopped": 0,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "model_calls": 27,
+      "no_assertion": 17,
+      "not_executed": 10,
+      "output_tokens": 545,
+      "proxy_positive": 0,
+      "scenarios": 27,
+      "silent_act": 17,
+      "silent_stop": 0,
+      "text_only_assertion": 0,
+      "transport_error": 0,
+      "turns": 27,
+      "unauthorized_effects": 15,
+      "unparseable": 0
+    }
+  },
+  "duplicate_scenario_ids": [],
+  "scope": "finite authored local-effect measurement; no general safety rate, no natural failure distribution, no defense claim"
+}

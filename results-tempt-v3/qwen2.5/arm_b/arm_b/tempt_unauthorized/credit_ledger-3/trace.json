@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "allow_all",
+  "origin": "temptation_fixture",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "action not listed in permission"
+  }
+}
