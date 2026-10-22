@@ -34,22 +34,45 @@ R3_WORKSPACE_CANDIDATES = [
 ]
 
 
+class UnsupportedSwitch(RuntimeError):
+    """The requested serving switch cannot be delivered by this backend.
+
+    Raised instead of degrading an arm. Arm E without its trained-verification
+    switch is Arm A wearing Arm E's label, which the protocol forbids.
+    """
+
+
 class Backend:
     """A model backend returns the raw assistant text for one prompt.
 
     After `complete()` returns, `self.last_usage` carries at least
     ``output_tokens``. The R5 cost endpoint consumes this so a small model and a
     large model are compared on the same axis, not on wall time alone.
+
+    `kwargs` carries arm-specific serving switches (Arm E's trained-verification
+    flag). A backend that cannot express a requested switch MUST raise
+    `UnsupportedSwitch` rather than ignore it: silently dropping the switch would
+    turn Arm E into Arm A and mislabel the result.
     """
 
     name = "base"
     kind = "real"
+    supported_switches: frozenset[str] = frozenset()
 
     def __init__(self) -> None:
         self.last_usage: dict = {"output_tokens": 0}
         self.total_usage: dict = {"output_tokens": 0, "calls": 0}
 
-    def complete(self, system: str, user: str) -> str:
+    def check_switch(self, kwargs: dict) -> None:
+        """Raise UnsupportedSwitch if this backend cannot deliver `kwargs`."""
+        for k in kwargs:
+            if k not in self.supported_switches:
+                raise UnsupportedSwitch(
+                    f"backend {self.name!r} cannot express serving switch {k!r}; "
+                    f"supported: {sorted(self.supported_switches)}"
+                )
+
+    def complete(self, system: str, user: str, **kwargs) -> str:
         raise NotImplementedError
 
     def _record(self, output_tokens: int) -> None:
@@ -74,7 +97,8 @@ class MockBackend(Backend):
         self.default = default
         self.calls = 0
 
-    def complete(self, system: str, user: str) -> str:
+    def complete(self, system: str, user: str, **kwargs) -> str:
+        self.check_switch(kwargs)
         self.calls += 1
         for key, reply in self.script.items():
             if key in user:
@@ -89,6 +113,10 @@ class OpenAIBackend(Backend):
 
     name = "openai"
     kind = "real"
+    # vLLM-style OpenAI-compatible servers accept chat_template_kwargs. Whether
+    # the served model actually implements the flag is a property of the
+    # deployment, so this must be probed before a run (see probe_trained_verify).
+    supported_switches = frozenset({"chat_template_kwargs"})
 
     def __init__(
         self,
@@ -108,7 +136,8 @@ class OpenAIBackend(Backend):
                 "set it to an OpenAI-compatible /v1/chat/completions base URL"
             )
 
-    def complete(self, system: str, user: str) -> str:
+    def complete(self, system: str, user: str, **kwargs) -> str:
+        self.check_switch(kwargs)
         body = json.dumps(
             {
                 "model": self.model,
@@ -117,6 +146,7 @@ class OpenAIBackend(Backend):
                     {"role": "user", "content": user},
                 ],
                 "temperature": 0.0,
+                **{k: v for k, v in kwargs.items()},
             }
         ).encode()
         headers = {"Content-Type": "application/json"}
@@ -143,6 +173,8 @@ class OllamaBackend(Backend):
 
     name = "ollama"
     kind = "real"
+    # the Ollama chat API has no chat-template switch surface
+    supported_switches: frozenset[str] = frozenset()
 
     def __init__(
         self,
@@ -171,7 +203,8 @@ class OllamaBackend(Backend):
             self.model_digest = None
         return {"model": self.model, "digest": self.model_digest}
 
-    def complete(self, system: str, user: str) -> str:
+    def complete(self, system: str, user: str, **kwargs) -> str:
+        self.check_switch(kwargs)
         body = json.dumps(
             {
                 "model": self.model,
@@ -248,6 +281,72 @@ def build_system(arm: str) -> tuple[str, dict]:
     if cfg["trained_verify"]:
         meta["trained_verify_switch"] = TRAINED_VERIFY_FLAG
     return system, meta
+
+
+def switch_kwargs(arm: str) -> dict:
+    """The serving-level switches this arm requires, ready to pass to complete().
+
+    Arms A-D require none: their only difference is the system prompt and whether
+    an external gate is installed. Arm E requires the trained-verification flag as
+    a chat-template kwarg, which is a serving surface, not a prompt.
+    """
+    if not ARMS[arm]["trained_verify"]:
+        return {}
+    return {"chat_template_kwargs": {TRAINED_VERIFY_FLAG: True}}
+
+
+class SwitchUnavailable(RuntimeError):
+    """Pre-call gate: the requested arm cannot be executed on this backend.
+
+    Distinct from UnsupportedSwitch (a programming error about backend surface):
+    this one means the run is legitimately *not executed*, and the protocol says
+    record it that way rather than substituting a weaker arm.
+    """
+
+
+def probe_trained_verify(backend: "Backend", timeout_note: str = "") -> dict:
+    """Return a verdict on whether this deployment can run Arm E.
+
+    A deployment "supports" the switch when (a) the backend surface can carry it
+    and (b) the server accepts it without an error. We do not attempt to confirm
+    that the flag *changes behaviour* — that is what the arm measures; we only
+    confirm the switch can be delivered at all, so that a null result cannot be
+    explained as "the flag was silently dropped".
+    """
+    kw = switch_kwargs("arm_e")
+    verdict: dict = {
+        "arm": "arm_e",
+        "switch": TRAINED_VERIFY_FLAG,
+        "kwargs": kw,
+        "backend": backend.name,
+        "delivered": False,
+        "reason": "",
+    }
+    if not kw:
+        verdict["reason"] = "no switch configured"
+        return verdict
+    try:
+        backend.check_switch(kw)
+    except UnsupportedSwitch as exc:
+        verdict["reason"] = f"backend cannot express the switch: {exc}"
+        return verdict
+
+    # Minimal probe: the switch must not make the server error out.
+    try:
+        out = backend.complete(
+            SYSTEM_BASE,
+            json.dumps({"probe": "arm_e switch acceptance", "respond": "one JSON object"}),
+            **kw,
+        )
+        verdict["delivered"] = True
+        verdict["probe_output_chars"] = len(out)
+    except UnsupportedSwitch as exc:  # pragma: no cover - defensive
+        verdict["reason"] = f"backend cannot express the switch: {exc}"
+    except Exception as exc:  # noqa: BLE001
+        verdict["reason"] = f"server rejected the switch: {type(exc).__name__}: {exc}"
+    if timeout_note:
+        verdict["note"] = timeout_note
+    return verdict
 
 
 def load_r3_core():

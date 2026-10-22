@@ -94,9 +94,9 @@ agreement on a payload that differs (\S\ref{sec:narration}).
 execution binding and verification instruction act on \emph{different} quantities:
 binding changes the outcome with identical model behaviour, instruction changes the
 behaviour (\S\ref{sec:conflict}).
-\item Two fixture defects, found by a code gate rather than by reading the prompts,
-which had produced a false leak in one direction and a false containment in the other
-(\S\ref{sec:defects}).
+\item Three defects in the apparatus itself --- two in the fixtures, one in an
+unexecuted arm's seam --- each of which produced, or would have produced, a result
+indistinguishable from a real measurement (\S\ref{sec:defects}).
 \end{enumerate}
 
 The scope is deliberately small and stated everywhere. These are finite authored
@@ -371,6 +371,11 @@ each fixture is internally consistent, that the goal action is absent from the g
 that the tempting payload is executable by the adapter, and that the four contexts
 differ in the way their names claim.
 
+A third defect, in the seam of the unexecuted arm rather than in a fixture, is reported
+in \S\ref{sec:arm_e}. The three are instances of one pattern: the apparatus could not
+express the construct the hypothesis named, and the failure was silent --- it produced a
+plausible number, or would have.
+
 The first defect made one condition self-contradictory: the action entry was kept while
 only the \texttt{authorized} flag was flipped. The verifier treats a tuple as permitted
 only when the flag is true, so a model that copied the displayed entry verbatim was
@@ -418,7 +423,7 @@ because no denominator exists: no acting cell produced an assertion. A reader wh
 a false-negative rate will not find one here, and constructing one requires a model that
 both violates and narrates. That is the arm we could not run.
 
-\subsection{The unexecuted arm}
+\subsection{The unexecuted arm}\label{sec:arm_e}
 
 The protocol's fifth arm uses a model trained for internal verification, which is the
 case the paper exists to inform: if a model's verification mode is trained rather than
@@ -428,6 +433,20 @@ model resident in memory, which is a 35B mixture-of-experts and beyond this mach
 record the arm as not executed, with the harness, the arm definition and the seam where
 a trained-verification backend would attach left in place, so the measurement can be
 completed elsewhere without redesigning it.
+
+Writing the arm out made one defect in that seam visible, and it is the same class of
+error as the fixture defects in \S\ref{sec:defects}. The arm was defined by a
+\texttt{trained\_verify} flag that reached only the per-run metadata; no serving
+argument was ever passed to the backend. An Arm~E run would therefore have executed the
+Arm~A prompt against a backend that ignored the switch, and the result would have carried
+Arm~E's label. The failure is silent by nature --- nothing in the output would have
+looked wrong --- and it is exactly the substitution the protocol forbids. The seam now
+carries the switch as a first-class argument, backends declare which switches they can
+express, a backend asked to deliver one it cannot express raises rather than ignoring it,
+and a run whose switch cannot be delivered exits with a written probe verdict before any
+scenario is executed. On the local backend this arm now refuses to run, which is the
+intended outcome: the measurement is absent and says so, rather than present under a
+borrowed name.
 
 \subsection{Reproducibility}
 

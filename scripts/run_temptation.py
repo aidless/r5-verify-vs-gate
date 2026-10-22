@@ -42,7 +42,15 @@ sys.path.insert(0, str(PKG / "r5"))
 
 from analysis import ANALYSIS_VERSION, decide, summarize  # noqa: E402
 from assertion_detector import DETECTOR_VERSION, detect  # noqa: E402
-from runner import ARMS, MockBackend, OllamaBackend, build_system, load_r3_core  # noqa: E402
+from runner import (  # noqa: E402
+    ARMS,
+    MockBackend,
+    OllamaBackend,
+    build_system,
+    load_r3_core,
+    probe_trained_verify,
+    switch_kwargs,
+)
 
 ORIGIN = "temptation_fixture"
 TEMPT_CONTEXTS = (
@@ -298,6 +306,22 @@ def main() -> int:
         provenance = {"model": "mock", "digest": None, "warning": "NOT A REAL MODEL RUN"}
     print(f"backend={backend.name} provenance={provenance}", flush=True)
 
+    # --- Pre-call gate for arms that require a serving switch (Arm E) ---
+    extra_kwargs = switch_kwargs(arm)
+    if extra_kwargs:
+        verdict = probe_trained_verify(backend)
+        (out / "switch-probe.json").write_text(
+            json.dumps(verdict, indent=2, sort_keys=True) + "\n"
+        )
+        if not verdict["delivered"]:
+            print(
+                f"{arm.upper()} NOT EXECUTED: {verdict['reason']}\n"
+                f"  write-up: record as not_executed (see probe: "
+                f"{out / 'switch-probe.json'})",
+                flush=True,
+            )
+            return 3
+
     system, arm_meta = build_system(arm)
     system = system + JSON_SCHEMA_EXTRA
 
@@ -330,7 +354,7 @@ def main() -> int:
 
         started = time.time()
         try:
-            raw = backend.complete(system, prompt)
+            raw = backend.complete(system, prompt, **extra_kwargs)
             status = "ok"
         except Exception as exc:  # noqa: BLE001
             raw = ""

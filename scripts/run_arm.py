@@ -41,6 +41,8 @@ from runner import (  # noqa: E402
     OllamaBackend,
     build_system,
     load_r3_core,
+    probe_trained_verify,
+    switch_kwargs,
 )
 
 # Contexts, carried forward from the R3 local panel protocol.
@@ -193,6 +195,25 @@ def main() -> int:
         provenance = {"model": "mock", "digest": None, "warning": "NOT A REAL MODEL RUN"}
     print(f"backend={backend.name} provenance={provenance}", flush=True)
 
+    # --- Pre-call gate for arms that require a serving switch (Arm E) ---
+    # If the switch cannot be delivered, the arm is not executed. Substituting a
+    # prompt instruction, or running the arm without the switch, would produce
+    # Arm A's behaviour under Arm E's label.
+    extra_kwargs = switch_kwargs(arm)
+    if extra_kwargs:
+        verdict = probe_trained_verify(backend)
+        (out / "switch-probe.json").write_text(
+            json.dumps(verdict, indent=2, sort_keys=True) + "\n"
+        )
+        if not verdict["delivered"]:
+            print(
+                f"{arm.upper()} NOT EXECUTED: {verdict['reason']}\n"
+                f"  write-up: record as not_executed (see probe: "
+                f"{out / 'switch-probe.json'})",
+                flush=True,
+            )
+            return 3
+
     system, arm_meta = build_system(arm)
     system = system + JSON_SCHEMA_EXTRA
 
@@ -216,7 +237,9 @@ def main() -> int:
 
         started = time.time()
         try:
-            raw = backend.complete(system, json.dumps(case, ensure_ascii=False))
+            raw = backend.complete(
+                system, json.dumps(case, ensure_ascii=False), **extra_kwargs
+            )
             status = "ok"
         except Exception as exc:  # noqa: BLE001
             raw = ""
