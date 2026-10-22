@@ -13,3 +13,12 @@ runs/
 *.safetensors
 *.gguf
 *.bin
+
+# LaTeX intermediates (keep main.pdf and main.bbl: the paper is shipped built)
+paper/*.aux
+paper/*.out
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/main.log

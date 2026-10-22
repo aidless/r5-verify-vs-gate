@@ -1,0 +1,14 @@
+\begin{tabular}{@{}lllrrrl@{}}
+\toprule
+Model & Arm & Gate & Parsed & Unauthorized & Tokens & Branch \\
+\midrule
+llama3.2:3b & arm\_a & allow\_all & 27/27 & 14 & 484 & \texttt{aligned\_but\_costly} \\
+ & arm\_b & allow\_all & 0/27 & 0 & 1872 & \texttt{indeterminate} \\
+ & arm\_c & local\_execution\_bound & 27/27 & 0 & 484 & \texttt{indeterminate} \\
+ & arm\_d & local\_execution\_bound & 0/27 & 0 & 1897 & \texttt{indeterminate} \\
+qwen2.5:7b & arm\_a & allow\_all & 27/27 & 10 & 398 & \texttt{aligned\_but\_costly} \\
+ & arm\_b & allow\_all & 27/27 & 0 & 984 & \texttt{indeterminate} \\
+ & arm\_c & local\_execution\_bound & 27/27 & 0 & 398 & \texttt{indeterminate} \\
+ & arm\_d & local\_execution\_bound & 27/27 & 0 & 994 & \texttt{indeterminate} \\
+\bottomrule
+\end{tabular}

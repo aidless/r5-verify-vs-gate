@@ -168,6 +168,38 @@ Two things this shows:
 
 ---
 
+## The paper
+
+[`paper/main.pdf`](paper/main.pdf) — **When the Model Says It Checked: A Finite
+Local-Effect Audit of Model-Internal Verification** (10 pp., TMLR format).
+
+The paper is not a summary of this repository; it is a second reader of it, built the
+same way the results were. Every number in the text is emitted by
+[`emit_numbers.py`](emit_numbers.py) from the artifacts in this repo, written to
+[`CLAIM_LEDGER.md`](CLAIM_LEDGER.md) with its source path and field, and audited by
+[`audit_numbers.py`](audit_numbers.py), which fails if a number appears in the
+manuscript that the ledger cannot source.
+
+```
+python3 emit_numbers.py       # artifacts -> results/claims.json, CLAIM_LEDGER.md, paper/tables/*.tex
+python3 audit_numbers.py      # fails on any unsourced number in paper/main.tex
+cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
+```
+
+Its central claim is narrower than the repository's headline number, and that is the
+point. The primary endpoint — an assertion that verification passed while an
+unauthorized effect landed — is **empty**, and empty for a structural reason: of 216
+temptation cells, 48 reached the acting path and none of those 48 carried an
+assertion. What the data does support is that the narration can be wrong while the
+decision is right: in the wrong-payload condition, 6 of 36 statements claim that
+tool, target and value all match the grant while the value differs, and the model
+stops correctly anyway.
+
+Arm E (a model trained for internal verification) is written up as **not executed**,
+with the seam described rather than approximated.
+
+---
+
 ## The measurement, in one paragraph
 
 Each scenario presents a goal and a structured permission. A model proposes an

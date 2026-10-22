@@ -1,0 +1,56 @@
+\begin{thebibliography}{9}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Liu et~al.(2026)Liu, Guo, Liu, Yang, Yan, Zhao, Hua, Liu, Li, Bu, and Wang]{liu2026harnessaudit}
+Chengzhi Liu, Yichen Guo, Yepeng Liu, Yuzhe Yang, Qianqi Yan, Xuandong Zhao, Wenyue Hua, Sheng Liu, Sharon Li, Yuheng Bu, and Xin~Eric Wang.
+\newblock Auditing agent harness safety, 2026.
+\newblock URL \url{https://arxiv.org/abs/2605.14271}.
+
+\bibitem[Liu(2026)]{liu2026approvalgates}
+Zewen Liu.
+\newblock Approval gates and safety prompts: A measurement audit from plans to local execution, 2026.
+\newblock arXiv preprint; not peer reviewed.
+
+\bibitem[{Microsoft Agent Governance Toolkit Contributors}(2026)]{microsoft2026actionbound}
+{Microsoft Agent Governance Toolkit Contributors}.
+\newblock {ADR} 0030: Use an action-bound, fail-closed approval protocol.
+\newblock Official repository, revision 47abed7446d4, 2026.
+\newblock URL \url{https://github.com/microsoft/agent-governance-toolkit/blob/47abed7446d47e74cfa76d01a5913bb873ffcad9/docs/adr/0030-action-bound-approval-protocol.md}.
+
+\bibitem[Mou et~al.(2026)Mou, Xue, Li, Liu, Zhang, Ye, and Shao]{mou2026toolsafe}
+Yutao Mou, Zhangchi Xue, Lijun Li, Peiyang Liu, Shikun Zhang, Wei Ye, and Jing Shao.
+\newblock Toolsafe: Enhancing tool invocation safety of llm-based agents via proactive step-level guardrail and feedback, 2026.
+\newblock URL \url{https://arxiv.org/abs/2601.10156}.
+\newblock Licensed CC-BY-4.0.
+
+\bibitem[Ng et~al.(2026)Ng, Han, Zhang, and Wang]{ng2026runtime}
+Albus~W. Ng, Yi~Han, Jusheng Zhang, and Wenhao Wang.
+\newblock Agent safety should be a runtime contract, 2026.
+\newblock URL \url{https://arxiv.org/abs/2608.11274}.
+
+\bibitem[{Shanghai AI Laboratory}(2026)]{sagea152026}
+{Shanghai AI Laboratory}.
+\newblock Sage-a1.5: From long-horizon execution to scientific exploration with capability composition, 2026.
+\newblock URL \url{https://arxiv.org/abs/2610.28578}.
+
+\bibitem[Singh(2026)]{singh2026scapegoats}
+Aarushi Singh.
+\newblock Guardrails as scapegoats: Auditing unfaithful safety refusals in tool-augmented llm agents, 2026.
+\newblock URL \url{https://arxiv.org/abs/2607.19449}.
+
+\bibitem[Weng(2026)]{weng2026consent}
+Xiaoqi Weng.
+\newblock What you approve is what executes: Consent integrity for black-box llm agents, 2026.
+\newblock URL \url{https://arxiv.org/abs/2606.02668}.
+
+\bibitem[Xiang et~al.(2024)Xiang, Zheng, Li, Hong, Li, Xie, Zhang, Xiong, Xie, Yang, Song, and Li]{xiang2025guardagent}
+Zhen Xiang, Linzhi Zheng, Yanjie Li, Junyuan Hong, Qinbin Li, Han Xie, Jiawei Zhang, Zidi Xiong, Chulin Xie, Carl Yang, Dawn Song, and Bo~Li.
+\newblock Guardagent: Safeguard llm agents by a guard agent via knowledge-enabled reasoning, 2024.
+\newblock URL \url{https://arxiv.org/abs/2406.09187}.
+\newblock Accepted to ICML 2025; licensed CC-BY-4.0.
+
+\end{thebibliography}
