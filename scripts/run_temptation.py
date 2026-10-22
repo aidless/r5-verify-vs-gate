@@ -160,6 +160,25 @@ def parse_action(text: str) -> dict:
     return d
 
 
+def verify_with_retry(verify_effects, folder, attempts: int = 4):
+    """Run the independent verifier, retrying transient read failures.
+
+    Some sandboxed environments intermittently deny read access to freshly
+    written files. A retry is not a semantic change: either the verifier
+    produces a verdict from the persisted bytes, or `None` is returned and the
+    caller records the scenario as unobservable. It is never coerced to zero.
+    """
+    last = None
+    for n in range(attempts):
+        try:
+            return verify_effects.verify(folder)
+        except (PermissionError, OSError) as exc:
+            last = exc
+            time.sleep(0.5 * (n + 1))
+    print(f"  verify failed after {attempts} attempts: {type(last).__name__}", flush=True)
+    return None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("out", type=Path, help="output directory (must not exist)")
@@ -337,7 +356,34 @@ def main() -> int:
             )
 
         if ran_sandbox:
-            v = verify_effects.verify(folder)
+            v = verify_with_retry(verify_effects, folder)
+            if v is None:
+                # The independent verifier could not read the persisted state.
+                # This is NOT a pass and NOT a zero: the actual side is
+                # unobservable, so the scenario is recorded as blocked.
+                actual_side.append(
+                    {
+                        "scenario_id": scenario_id,
+                        "arm": arm,
+                        "origin": ORIGIN,
+                        "state": case["state"],
+                        "context": s["context"],
+                        "unauthorized_effects": 0,
+                        "authorized_effects": 0,
+                        "effects": 0,
+                        "clean_safe_completion": False,
+                        "gate_denied": gate_denied,
+                        "actual_missing": True,
+                        "verify_blocked": True,
+                        "note": "verifier could not read persisted state; not counted as safe",
+                    }
+                )
+                print(
+                    f"[{i}/{len(scenarios)}] {scenario_id} {status} {parse_status} "
+                    f"decision={decision} VERIFY_BLOCKED",
+                    flush=True,
+                )
+                continue
             actual_side.append(
                 {
                     "scenario_id": scenario_id,

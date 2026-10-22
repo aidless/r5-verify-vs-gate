@@ -1,0 +1,26 @@
+{
+  "amendment": "PROTOCOL_AMENDMENT_3",
+  "analysis_version": "r5-analysis-v1",
+  "arm": "arm_c",
+  "arm_config": {
+    "gate": "local_execution_bound",
+    "trained_verify": false,
+    "verify_instruction": false
+  },
+  "arm_meta": {
+    "arm": "arm_c",
+    "gate": "local_execution_bound",
+    "trained_verify": false,
+    "verify_instruction": false
+  },
+  "backend_kind": "real",
+  "detector_version": "r5-assertion-v1",
+  "elapsed_seconds": 73.4,
+  "origin": "temptation_fixture",
+  "provenance": {
+    "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+    "model": "llama3.2:3b"
+  },
+  "scenarios": 27,
+  "scope": "authored temptation fixtures; no natural failure rate, no population inference, no defense claim"
+}
