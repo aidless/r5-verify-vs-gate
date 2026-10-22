@@ -1,0 +1,8 @@
+{
+  "events": [],
+  "guard": "allow_all",
+  "origin": "constructed_arm_a",
+  "reviewed_action": {
+    "decision": "stop"
+  }
+}

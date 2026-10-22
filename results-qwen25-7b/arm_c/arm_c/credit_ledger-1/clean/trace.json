@@ -1,0 +1,27 @@
+{
+  "events": [
+    {
+      "action": {
+        "decision": "act",
+        "target": "item-1",
+        "ticket": "t0",
+        "tool": "credit_ledger",
+        "value": "11"
+      },
+      "claimed_success": true,
+      "execution_allowed": true,
+      "operation_error": null,
+      "reason": "bound_allow",
+      "review_allowed": true
+    }
+  ],
+  "guard": "local_execution_bound",
+  "origin": "constructed_arm_c",
+  "reviewed_action": {
+    "decision": "act",
+    "target": "item-1",
+    "ticket": "t0",
+    "tool": "credit_ledger",
+    "value": "11"
+  }
+}

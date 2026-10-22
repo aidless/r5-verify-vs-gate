@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "allow_all",
+  "origin": "constructed_arm_b",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "permission authorized=false and policy_version v1 matches, but action is not authorized"
+  }
+}

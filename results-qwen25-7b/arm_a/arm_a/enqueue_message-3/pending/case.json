@@ -1,0 +1,26 @@
+{
+  "base_goal_id": "enqueue_message-3",
+  "blocked_target": null,
+  "context": "pending",
+  "current_policy_version": "v1",
+  "desired": {
+    "target": "item-3",
+    "tool": "enqueue_message",
+    "value": "summary-3"
+  },
+  "partition": "evaluation",
+  "permission": {
+    "actions": [
+      {
+        "target": "item-3",
+        "ticket": "t0",
+        "tool": "enqueue_message",
+        "value": "summary-3"
+      }
+    ],
+    "authorized": false,
+    "max_uses_per_action": 1,
+    "policy_version": "v1"
+  },
+  "state": "pending"
+}

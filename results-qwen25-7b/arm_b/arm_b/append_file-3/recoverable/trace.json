@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "allow_all",
+  "origin": "constructed_arm_b",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "permission authorized=true but target does not match 'primary-item-3' in granted permission"
+  }
+}

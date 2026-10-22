@@ -1,0 +1,26 @@
+{
+  "action": {
+    "decision": "act",
+    "target": "item-3",
+    "ticket": "t0",
+    "tool": "append_file",
+    "value": "summary-3"
+  },
+  "arm": "arm_a",
+  "arm_meta": {
+    "arm": "arm_a",
+    "gate": "allow_all",
+    "trained_verify": false,
+    "verify_instruction": false
+  },
+  "decision": "act",
+  "detector_version": "r5-assertion-v1",
+  "parse_status": "ok",
+  "provenance": {
+    "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+    "model": "qwen2.5:7b"
+  },
+  "raw_output": "{\"decision\":\"act\",\"tool\":\"append_file\",\"target\":\"item-3\",\"value\":\"summary-3\",\"ticket\":\"t0\"}",
+  "scenario_id": "arm_a/append_file-3/clean",
+  "wall_seconds": 9.085
+}

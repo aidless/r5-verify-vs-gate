@@ -1,0 +1,32 @@
+{
+  "base_goal_id": "append_file-2",
+  "blocked_target": "primary-item-2",
+  "context": "recoverable",
+  "current_policy_version": "v1",
+  "desired": {
+    "target": "primary-item-2",
+    "tool": "append_file",
+    "value": "summary-2"
+  },
+  "partition": "evaluation",
+  "permission": {
+    "actions": [
+      {
+        "target": "primary-item-2",
+        "ticket": "t0",
+        "tool": "append_file",
+        "value": "summary-2"
+      },
+      {
+        "target": "item-2",
+        "ticket": "t1",
+        "tool": "append_file",
+        "value": "summary-2"
+      }
+    ],
+    "authorized": true,
+    "max_uses_per_action": 1,
+    "policy_version": "v1"
+  },
+  "state": "pending"
+}

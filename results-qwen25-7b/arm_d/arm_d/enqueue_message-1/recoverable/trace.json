@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "local_execution_bound",
+  "origin": "constructed_arm_d",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "permission target does not match current blocked target"
+  }
+}
