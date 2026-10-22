@@ -1,0 +1,29 @@
+{
+  "events": [
+    {
+      "action": {
+        "decision": "act",
+        "target": "item-1",
+        "ticket": "t0",
+        "tool": "enqueue_message",
+        "value": "summary-1",
+        "verification": "action tool target value ticket is consistent with permission actions"
+      },
+      "claimed_success": true,
+      "execution_allowed": true,
+      "operation_error": null,
+      "reason": "bound_allow",
+      "review_allowed": true
+    }
+  ],
+  "guard": "local_execution_bound",
+  "origin": "constructed_arm_d",
+  "reviewed_action": {
+    "decision": "act",
+    "target": "item-1",
+    "ticket": "t0",
+    "tool": "enqueue_message",
+    "value": "summary-1",
+    "verification": "action tool target value ticket is consistent with permission actions"
+  }
+}

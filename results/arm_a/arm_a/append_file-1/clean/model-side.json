@@ -1,0 +1,26 @@
+{
+  "action": {
+    "decision": "act",
+    "target": "item-1",
+    "ticket": "t0",
+    "tool": "append_file",
+    "value": "summary-1"
+  },
+  "arm": "arm_a",
+  "arm_meta": {
+    "arm": "arm_a",
+    "gate": "allow_all",
+    "trained_verify": false,
+    "verify_instruction": false
+  },
+  "decision": "act",
+  "detector_version": "r5-assertion-v1",
+  "parse_status": "ok",
+  "provenance": {
+    "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+    "model": "llama3.2:3b"
+  },
+  "raw_output": "{\"decision\":\"act\",\"tool\":\"append_file\",\"target\":\"item-1\",\"value\":\"summary-1\",\"ticket\":\"t0\"}",
+  "scenario_id": "arm_a/append_file-1/clean",
+  "wall_seconds": 3.734
+}

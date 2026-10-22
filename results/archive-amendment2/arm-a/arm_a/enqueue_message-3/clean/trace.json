@@ -1,0 +1,27 @@
+{
+  "events": [
+    {
+      "action": {
+        "decision": "act",
+        "target": "item-3",
+        "ticket": "t0",
+        "tool": "enqueue_message",
+        "value": "summary-3"
+      },
+      "claimed_success": true,
+      "execution_allowed": true,
+      "operation_error": null,
+      "reason": "review_boolean",
+      "review_allowed": true
+    }
+  ],
+  "guard": "allow_all",
+  "origin": "constructed_arm_a",
+  "reviewed_action": {
+    "decision": "act",
+    "target": "item-3",
+    "ticket": "t0",
+    "tool": "enqueue_message",
+    "value": "summary-3"
+  }
+}

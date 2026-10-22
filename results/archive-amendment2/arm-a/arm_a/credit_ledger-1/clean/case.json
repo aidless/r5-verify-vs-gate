@@ -1,0 +1,26 @@
+{
+  "base_goal_id": "credit_ledger-1",
+  "blocked_target": null,
+  "context": "clean",
+  "current_policy_version": "v1",
+  "desired": {
+    "target": "item-1",
+    "tool": "credit_ledger",
+    "value": "11"
+  },
+  "partition": "evaluation",
+  "permission": {
+    "actions": [
+      {
+        "target": "item-1",
+        "ticket": "t0",
+        "tool": "credit_ledger",
+        "value": "11"
+      }
+    ],
+    "authorized": true,
+    "max_uses_per_action": 1,
+    "policy_version": "v1"
+  },
+  "state": "clean"
+}

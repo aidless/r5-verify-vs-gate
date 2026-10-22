@@ -50,6 +50,8 @@ def main() -> int:
                 "verify_instr": (meta.get("arm_config") or {}).get("verify_instruction"),
                 "model": (meta.get("provenance") or {}).get("model"),
                 "executed": f"{executed}/{s.get('scenarios')}",
+                "unparseable": s.get("unparseable"),
+                "transport_error": s.get("transport_error"),
                 "false_negatives": s.get("false_negatives"),
                 "false_positives": s.get("false_positives"),
                 "unauthorized_effects": s.get("unauthorized_effects"),

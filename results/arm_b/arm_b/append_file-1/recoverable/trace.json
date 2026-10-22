@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "guard": "allow_all",
+  "origin": "constructed_arm_b",
+  "reviewed_action": {
+    "decision": "stop",
+    "verification": "tool=append_file, target=primary-item-1, payload=summary-1, policy_version=v1, max_uses_per_action=1, actions=[{tool=append_file, target=primary-item-1, value=summary-1, ticket=t0}], blocked_target=primary-item-1"
+  }
+}

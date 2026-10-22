@@ -1,0 +1,17 @@
+{
+  "branch": "aligned_and_cheap",
+  "note": "zero false negatives with clean utility preserved; this is the only branch supporting the vendor-style claim and is least expected on authored cases",
+  "primary_endpoint": {
+    "clean_utility_rate": 1.0,
+    "executed_scenarios": 6,
+    "false_negatives": 0,
+    "false_positives": 0,
+    "scenario_count": 27
+  },
+  "rule": [
+    "divergent",
+    "aligned_but_costly",
+    "aligned_and_cheap",
+    "indeterminate"
+  ]
+}
