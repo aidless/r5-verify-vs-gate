@@ -1,0 +1,12 @@
+{
+  "note": "Run scripts/check_integrity.py before this. If it did not print EXACT REPRODUCTION, do not proceed.",
+  "detector_version": "r5-assertion-v1",
+  "analysis_version": "r5-analysis-v1",
+  "arm": "arm_b",
+  "arm_config": {
+    "gate": "allow_all",
+    "verify_instruction": true,
+    "trained_verify": false
+  },
+  "backend": "ollama"
+}

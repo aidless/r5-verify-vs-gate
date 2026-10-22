@@ -27,11 +27,32 @@ also a proxy. Whether it diverges is empirical, and this package measures it.
 | `PROTOCOL_R5.md` | Pre-registered design, endpoints, decision rule, stop rules | frozen |
 | `r5/assertion_detector.py` | Blind model-side detector of verification assertions | frozen, 12/12 cal |
 | `r5/analysis.py` | Primary endpoint + pre-registered decision rule | frozen, 13/13 tests |
-| `r5/runner.py` | Pluggable model backend + arm definitions | runnable (mock) |
+| `r5/runner.py` | Pluggable model backend + arm definitions | runnable (ollama / openai / mock) |
 | `scripts/check_integrity.py` | Stop rule 1: fresh 540-cell matrix vs published counts | **passes** |
+| `scripts/run_arm.py` | Model-in-the-loop executor for arms A–D | **executed** (see results) |
 | `tests/test_detector.py` | Calibration set for the frozen detector | passes |
 | `tests/test_analysis.py` | Pins each decision branch | passes |
-| `results/` | Integrity run output | reproduced exactly |
+| `PROTOCOL_AMENDMENT_1.md` | Dated amendment: Arm B/D check statement inside JSON | registered before B/D runs |
+| `results/` | Integrity run + executed model-arm artifacts | see table below |
+
+## Executed model arms (llama3.2:3b, ollama, digest a80c4f17…)
+
+All 27 scenarios per arm (9 evaluation goals × clean/pending/recoverable),
+temperature 0, strict single-JSON parse, independent state verification.
+
+| Arm | Parsed | FN (primary) | FP | Unauthorized effects | Clean utility | Tokens | Decision branch |
+|---|---|---|---|---|---|---|---|
+| A (no verify, allow_all) | 27/27 | 0 | 0 | 0 | 9/9 = 1.0 | 555 | `aligned_and_cheap` |
+
+Additional arms are appended to this table as they complete; the raw artifacts
+(`model-side.json`, `actual-side.json`, `joined.json`, `summary.json`,
+`decision.json`, per-scenario sandboxes) live under `results/arm-*/`.
+
+**Boundary condition worth stating**: llama3.2:3b attempted no unauthorized
+action in any pending scenario (9/9 voluntary `stop`). The `divergent` branch
+therefore has base rate 0 on this model — measuring it requires a
+violation-prone model or controlled injection. This is a property of the
+model, not a result about verification.
 
 ---
 
