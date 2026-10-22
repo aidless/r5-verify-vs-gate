@@ -35,13 +35,27 @@ R3_WORKSPACE_CANDIDATES = [
 
 
 class Backend:
-    """A model backend returns the raw assistant text for one prompt."""
+    """A model backend returns the raw assistant text for one prompt.
+
+    After `complete()` returns, `self.last_usage` carries at least
+    ``output_tokens``. The R5 cost endpoint consumes this so a small model and a
+    large model are compared on the same axis, not on wall time alone.
+    """
 
     name = "base"
     kind = "real"
 
+    def __init__(self) -> None:
+        self.last_usage: dict = {"output_tokens": 0}
+        self.total_usage: dict = {"output_tokens": 0, "calls": 0}
+
     def complete(self, system: str, user: str) -> str:
         raise NotImplementedError
+
+    def _record(self, output_tokens: int) -> None:
+        self.last_usage = {"output_tokens": int(output_tokens or 0)}
+        self.total_usage["output_tokens"] += int(output_tokens or 0)
+        self.total_usage["calls"] += 1
 
 
 class MockBackend(Backend):
@@ -55,6 +69,7 @@ class MockBackend(Backend):
     kind = "mock"
 
     def __init__(self, script: dict[str, str] | None = None, default: str = ""):
+        super().__init__()
         self.script = dict(script or {})
         self.default = default
         self.calls = 0
@@ -63,7 +78,9 @@ class MockBackend(Backend):
         self.calls += 1
         for key, reply in self.script.items():
             if key in user:
+                self._record(len(reply.split()))
                 return reply
+        self._record(len(self.default.split()))
         return self.default
 
 
@@ -80,6 +97,7 @@ class OpenAIBackend(Backend):
         api_key: str | None = None,
         timeout: int = 120,
     ):
+        super().__init__()
         self.endpoint = endpoint or os.environ.get("R5_MODEL_ENDPOINT", "")
         self.model = model or os.environ.get("R5_MODEL_NAME", "")
         self.api_key = api_key or os.environ.get("R5_MODEL_API_KEY", "")
@@ -113,6 +131,69 @@ class OpenAIBackend(Backend):
         with urllib.request.urlopen(req, timeout=self.timeout) as resp:
             payload = json.loads(resp.read().decode())
         return payload["choices"][0]["message"]["content"]
+
+
+class OllamaBackend(Backend):
+    """Any model served by a local Ollama daemon.
+
+    Default endpoint is the standard local daemon. No network egress, no paid
+    service. The model identity (name + digest) is captured into every record so a
+    later reader can tell exactly which weights produced it.
+    """
+
+    name = "ollama"
+    kind = "real"
+
+    def __init__(
+        self,
+        model: str | None = None,
+        host: str | None = None,
+        timeout: int = 300,
+    ):
+        super().__init__()
+        self.host = (host or os.environ.get("R5_OLLAMA_HOST", "http://127.0.0.1:11434")).rstrip("/")
+        self.model = model or os.environ.get("R5_MODEL_NAME", "llama3.2:3b")
+        self.timeout = timeout
+        self.model_digest: str | None = None
+
+    def identify(self) -> dict:
+        """Capture model name + digest for provenance. Best-effort, never fatal."""
+        if self.model_digest:
+            return {"model": self.model, "digest": self.model_digest}
+        try:
+            with urllib.request.urlopen(self.host + "/api/tags", timeout=10) as resp:
+                payload = json.loads(resp.read().decode())
+            for m in payload.get("models", []):
+                if m.get("name") == self.model or m.get("model") == self.model:
+                    self.model_digest = m.get("digest")
+                    break
+        except Exception:
+            self.model_digest = None
+        return {"model": self.model, "digest": self.model_digest}
+
+    def complete(self, system: str, user: str) -> str:
+        body = json.dumps(
+            {
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ],
+                "stream": False,
+                "options": {"temperature": 0.0},
+            }
+        ).encode()
+        req = urllib.request.Request(
+            self.host + "/api/chat",
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            payload = json.loads(resp.read().decode())
+        # Ollama reports token counts in the response body when stream=False.
+        self._record(int(payload.get("eval_count") or 0))
+        return payload["message"]["content"]
 
 
 # ---------------------------------------------------------------------------

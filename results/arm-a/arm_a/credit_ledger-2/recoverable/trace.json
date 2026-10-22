@@ -1,0 +1,27 @@
+{
+  "events": [
+    {
+      "action": {
+        "decision": "act",
+        "target": "closed-slot",
+        "ticket": "t0",
+        "tool": "credit_ledger",
+        "value": "12"
+      },
+      "claimed_success": false,
+      "execution_allowed": true,
+      "operation_error": "IntegrityError",
+      "reason": "review_boolean",
+      "review_allowed": true
+    }
+  ],
+  "guard": "allow_all",
+  "origin": "constructed_arm_a",
+  "reviewed_action": {
+    "decision": "act",
+    "target": "closed-slot",
+    "ticket": "t0",
+    "tool": "credit_ledger",
+    "value": "12"
+  }
+}
