@@ -25,7 +25,7 @@ import json
 import re
 from pathlib import Path
 
-REPO = Path("/home/liuzewen/WorkBuddy/2026-10-21-21-24-58/r5-verify-vs-gate")
+REPO = Path(__file__).resolve().parent
 OUT = Path(__file__).resolve().parent
 PAPER_TABLES = OUT / "paper" / "tables"
 
