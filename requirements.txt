@@ -1,0 +1,10 @@
+# Generated from static import analysis (see AUDIT.md provenance note).
+# Repo: aidless/r5-verify-vs-gate
+# Only top-level third-party imports are listed; stdlib and in-repo modules are excluded.
+# Versions are intentionally unpinned unless a floor is required for API compatibility.
+
+pytest  # tests/test_arm_e.py:26
+
+# --- optional / conditionally imported (guarded by try/except or lazily loaded) ---
+# audit_core  # r5/runner.py:359
+# verify_effects  # r5/runner.py:360
