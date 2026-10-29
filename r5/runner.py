@@ -28,10 +28,27 @@ from pathlib import Path
 # R3 workspace is present, and degrades to a clear error when it is not.
 HERE = Path(__file__).resolve().parent
 PKG_ROOT = HERE.parent
+_R3_SUPPLEMENT = "evidence/supplement/workspace/approval/supplement-20261014"
 R3_WORKSPACE_CANDIDATES = [
-    Path.home()
-    / "arxiv-publication/papers/approval-gates-r3/evidence/supplement/workspace/approval/supplement-20261014",
+    Path.home() / "arxiv-publication/papers/approval-gates-r3" / _R3_SUPPLEMENT,
+    # Sibling checkout, which is how CI lays the two repositories out.
+    PKG_ROOT.parent / "approval-gates-r3" / _R3_SUPPLEMENT,
 ]
+
+
+def r3_candidates() -> list[Path]:
+    """Every place the R3 supplement may live, most explicit first.
+
+    ``R5_R3_WORKSPACE`` was named in this module's error message long before it
+    was read, which made the message unactionable: a caller who did exactly what
+    it said still got the same failure. Honouring it now keeps the message true.
+    """
+    ordered: list[Path] = []
+    explicit = os.environ.get("R5_R3_WORKSPACE", "").strip()
+    if explicit:
+        ordered.append(Path(explicit).expanduser())
+    ordered.extend(R3_WORKSPACE_CANDIDATES)
+    return ordered
 
 
 class UnsupportedSwitch(RuntimeError):
@@ -351,7 +368,7 @@ def probe_trained_verify(backend: "Backend", timeout_note: str = "") -> dict:
 
 def load_r3_core():
     """Import the R3 audit core and verifier, or raise with an actionable message."""
-    for cand in R3_WORKSPACE_CANDIDATES:
+    for cand in r3_candidates():
         if (cand / "audit_core.py").exists():
             import sys
 
@@ -361,9 +378,9 @@ def load_r3_core():
 
             return audit_core, verify_effects
     raise RuntimeError(
-        "R3 workspace not found. Set R5_R3_WORKSPACE or place the approval-gates-r3 "
-        "evidence/supplement/workspace/approval/supplement-20261014 directory at a "
-        "path listed in R3_WORKSPACE_CANDIDATES."
+        "R3 workspace not found. Set R5_R3_WORKSPACE to the approval-gates-r3 "
+        f"{_R3_SUPPLEMENT} directory, or place it at one of: "
+        + ", ".join(str(p) for p in r3_candidates())
     )
 
 

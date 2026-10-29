@@ -13,5 +13,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      # Two fixture tests read the R3 local-effect core, which lives in the
+      # sibling repository. Without it they cannot run, and the run was red
+      # rather than skipped -- correct behaviour, wrong cause.
+      - name: Check out the R3 workspace the fixture tests read
+        run: |
+          git clone --depth 1 https://github.com/aidless/approval-gates-r3.git \
+            "$RUNNER_TEMP/approval-gates-r3"
+          echo "R5_R3_WORKSPACE=$RUNNER_TEMP/approval-gates-r3/evidence/supplement/workspace/approval/supplement-20261014" >> "$GITHUB_ENV"
       - run: python -m pip install pytest
+      - name: Fail if the R3 workspace did not materialise
+        run: test -f "$R5_R3_WORKSPACE/audit_core.py"
       - run: python -m pytest tests -q
