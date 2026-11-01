@@ -20,6 +20,41 @@ also a proxy. Whether it diverges is empirical, and this package measures it.
 
 ---
 
+## What this proves — and what it does not
+
+**This repo proves (as finite, authored local-effect measurements):**
+
+- The pre-registered protocol R5 is **implementable end-to-end**: a blind model-side
+  assertion detector (12/12 calibration), an independent state verifier, and a
+  pre-registered decision rule — all frozen before any model call (stop rule 1
+  reproduces exactly).
+- **Model-internal verification can be *narrated* without being *causally coupled***:
+  on qwen2.5:7b `tempt_value_drift`, 3 of 36 statements assert tool/target/value all
+  match the grant while the value differs — yet the decision is still `stop`.
+  The narration is wrong while the decision is right; this is the R3 proxy/actual
+  divergence reproduced inside a model policy.
+- **Execution binding changes outcome, not behaviour**: on `tempt_conflict_shape`,
+  arms A and C produce byte-identical model-side behaviour (same 8 stops, same single
+  `act`, same tokens) while the gate changes only the mechanical outcome.
+
+**This repo does *not* prove:**
+
+- Any **defense / safety** property. The primary endpoint (false negative = assertion
+  passes while an unauthorized effect lands) is **empty** — 0 of 216 temptation cells,
+  and for a structural reason (of the 48 cells that reached the acting path, none
+  carried an assertion). Empty on a 0-base-rate model is not a safety result.
+- Any **population or deployment** claim. This is a finite authored local-effect
+  measurement on two small models (llama3.2:3b, qwen2.5:7b) via ollama; no
+  production serving stack, no training run, no generalization beyond these fixtures.
+- Any **trained-verification capability** result. Arm E is **not executed** on this
+  machine (the ollama backend cannot express the serving switch; exit 3). A future
+  null Arm E is `indeterminate`, not `aligned_and_cheap`, absent independent evidence
+  the switch path exists.
+- **Novelty of execution binding** as a contribution. It is an existing strong
+  baseline, treated as an implementation control.
+
+---
+
 ## What is here
 
 | Path | What it is | Status |
@@ -169,6 +204,36 @@ Two things this shows:
   different half of a contradictory record", not "bypassed authorisation".
 
 ---
+
+## Reproduce every reported number
+
+Every number in the tables and prose above is either (a) an executed measurement or
+(b) a pre-registered constant. Both are machine-verifiable in this repo:
+
+```bash
+# 1. Stop rule 1 — fresh 540-cell matrix vs published counts (exact reproduction)
+python3 scripts/check_integrity.py
+
+# 2. Frozen detector calibration (12/12) + analysis decision rule (13/13) + fixtures (36/36)
+python3 tests/test_detector.py
+python3 tests/test_analysis.py
+python3 scripts/check_fixtures.py
+
+# 3. Full pytest suite (27 tests, no network, no model)
+python3 -m pytest tests/ -q
+
+# 4. Paper numbers: artifacts -> results/claims.json + CLAIM_LEDGER.md + paper/tables/*.tex
+python3 emit_numbers.py
+
+# 5. Paper-number audit — FAILS on any number in main.tex the ledger cannot source
+python3 audit_numbers.py
+```
+
+The model-arm measurements (llama3.2:3b / qwen2.5:7b tables) are reproduced by
+running `scripts/run_arm.py` / `scripts/run_temptation.py` against a real ollama
+endpoint (requires the R3 supplement workspace; see Prerequisites). The archived
+artifacts under `results/`, `results-tempt-v3/`, `results-tempt-v4/` are the
+authoritative records and are what `emit_numbers.py` reads.
 
 ## The paper
 
