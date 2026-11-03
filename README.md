@@ -1,5 +1,7 @@
 # r5-verify-vs-gate
 
+[![checks](https://github.com/aidless/r5-verify-vs-gate/actions/workflows/checks.yml/badge.svg)](https://github.com/aidless/r5-verify-vs-gate/actions/workflows/checks.yml)
+
 **External approval gate vs. model-internal self-verification: a finite local-effect
 measurement of proxy/actual divergence.**
 
