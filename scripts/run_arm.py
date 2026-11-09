@@ -154,10 +154,35 @@ def main() -> int:
     a = ap.parse_args()
 
     arm = a.arm
-    audit_core, verify_effects = load_r3_core()
-
     out = Path(a.out)
-    out.mkdir(parents=True, exist_ok=False)
+
+    # Arm E's refusal is a property of the backend, not of the R3 supplement.
+    # Probe before importing that core so a missing sibling is not reported as
+    # a crash (exit 1) in place of "not executed" (exit 3).
+    extra_kwargs = switch_kwargs(arm)
+    backend = None
+    if extra_kwargs:
+        out.mkdir(parents=True, exist_ok=False)
+        if a.backend == "ollama":
+            backend = OllamaBackend(model=a.model, host=a.host, timeout=a.timeout)
+        else:
+            backend = MockBackend(default='{"decision":"stop"}')
+        verdict = probe_trained_verify(backend)
+        (out / "switch-probe.json").write_text(
+            json.dumps(verdict, indent=2, sort_keys=True) + "\n"
+        )
+        if not verdict["delivered"]:
+            print(
+                f"{arm.upper()} NOT EXECUTED: {verdict['reason']}\n"
+                f"  write-up: record as not_executed (see probe: "
+                f"{out / 'switch-probe.json'})",
+                flush=True,
+            )
+            return 3
+
+    audit_core, verify_effects = load_r3_core()
+    if not extra_kwargs:
+        out.mkdir(parents=True, exist_ok=False)
 
     # --- Stop rule 1 is a precondition, not something this script re-runs. ---
     (out / "precondition.json").write_text(
@@ -187,32 +212,18 @@ def main() -> int:
     print(f"froze manifest: {len(scenarios)} scenarios -> {manifest_path}", flush=True)
 
     # --- Backend ---
+    # Arm E constructed its backend for the pre-call probe above. Arms A–D
+    # construct it here, after the R3 core has loaded.
+    if backend is None:
+        if a.backend == "ollama":
+            backend = OllamaBackend(model=a.model, host=a.host, timeout=a.timeout)
+        else:
+            backend = MockBackend(default='{"decision":"stop"}')
     if a.backend == "ollama":
-        backend = OllamaBackend(model=a.model, host=a.host, timeout=a.timeout)
         provenance = backend.identify()
     else:
-        backend = MockBackend(default='{"decision":"stop"}')
         provenance = {"model": "mock", "digest": None, "warning": "NOT A REAL MODEL RUN"}
     print(f"backend={backend.name} provenance={provenance}", flush=True)
-
-    # --- Pre-call gate for arms that require a serving switch (Arm E) ---
-    # If the switch cannot be delivered, the arm is not executed. Substituting a
-    # prompt instruction, or running the arm without the switch, would produce
-    # Arm A's behaviour under Arm E's label.
-    extra_kwargs = switch_kwargs(arm)
-    if extra_kwargs:
-        verdict = probe_trained_verify(backend)
-        (out / "switch-probe.json").write_text(
-            json.dumps(verdict, indent=2, sort_keys=True) + "\n"
-        )
-        if not verdict["delivered"]:
-            print(
-                f"{arm.upper()} NOT EXECUTED: {verdict['reason']}\n"
-                f"  write-up: record as not_executed (see probe: "
-                f"{out / 'switch-probe.json'})",
-                flush=True,
-            )
-            return 3
 
     system, arm_meta = build_system(arm)
     system = system + JSON_SCHEMA_EXTRA

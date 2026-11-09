@@ -243,9 +243,33 @@ def main() -> int:
     a = ap.parse_args()
 
     arm = a.arm
-    audit_core, verify_effects = load_r3_core()
     out = Path(a.out)
-    out.mkdir(parents=True, exist_ok=False)
+
+    # Same rule as run_arm.py: Arm E's refusal does not depend on the R3 core.
+    extra_kwargs = switch_kwargs(arm)
+    backend = None
+    if extra_kwargs:
+        out.mkdir(parents=True, exist_ok=False)
+        if a.backend == "ollama":
+            backend = OllamaBackend(model=a.model, host=a.host, timeout=a.timeout)
+        else:
+            backend = MockBackend(default='{"decision":"stop"}')
+        verdict = probe_trained_verify(backend)
+        (out / "switch-probe.json").write_text(
+            json.dumps(verdict, indent=2, sort_keys=True) + "\n"
+        )
+        if not verdict["delivered"]:
+            print(
+                f"{arm.upper()} NOT EXECUTED: {verdict['reason']}\n"
+                f"  write-up: record as not_executed (see probe: "
+                f"{out / 'switch-probe.json'})",
+                flush=True,
+            )
+            return 3
+
+    audit_core, verify_effects = load_r3_core()
+    if not extra_kwargs:
+        out.mkdir(parents=True, exist_ok=False)
 
     (out / "precondition.json").write_text(
         json.dumps(
@@ -298,29 +322,16 @@ def main() -> int:
     )
     print(f"froze manifest: {len(scenarios)} temptation scenarios -> {out}", flush=True)
 
+    if backend is None:
+        if a.backend == "ollama":
+            backend = OllamaBackend(model=a.model, host=a.host, timeout=a.timeout)
+        else:
+            backend = MockBackend(default='{"decision":"stop"}')
     if a.backend == "ollama":
-        backend = OllamaBackend(model=a.model, host=a.host, timeout=a.timeout)
         provenance = backend.identify()
     else:
-        backend = MockBackend(default='{"decision":"stop"}')
         provenance = {"model": "mock", "digest": None, "warning": "NOT A REAL MODEL RUN"}
     print(f"backend={backend.name} provenance={provenance}", flush=True)
-
-    # --- Pre-call gate for arms that require a serving switch (Arm E) ---
-    extra_kwargs = switch_kwargs(arm)
-    if extra_kwargs:
-        verdict = probe_trained_verify(backend)
-        (out / "switch-probe.json").write_text(
-            json.dumps(verdict, indent=2, sort_keys=True) + "\n"
-        )
-        if not verdict["delivered"]:
-            print(
-                f"{arm.upper()} NOT EXECUTED: {verdict['reason']}\n"
-                f"  write-up: record as not_executed (see probe: "
-                f"{out / 'switch-probe.json'})",
-                flush=True,
-            )
-            return 3
 
     system, arm_meta = build_system(arm)
     system = system + JSON_SCHEMA_EXTRA

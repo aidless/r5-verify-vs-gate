@@ -7,15 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.12']
+        python-version: ['3.11', '3.12']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      # Two fixture tests read the R3 local-effect core, which lives in the
-      # sibling repository. Without it they cannot run, and the run was red
-      # rather than skipped -- correct behaviour, wrong cause.
+      # test_all_27_live_fixtures_pass, check_fixtures.py, and check_integrity.py
+      # read the R3 local-effect core from the sibling repository. Without it
+      # those steps fail closed. They are not skipped, and they do not call a model.
       - name: Check out the R3 workspace the fixture tests read
         run: |
           git clone --depth 1 https://github.com/aidless/approval-gates-r3.git \
@@ -24,4 +24,11 @@ jobs:
       - run: python -m pip install pytest
       - name: Fail if the R3 workspace did not materialise
         run: test -f "$R5_R3_WORKSPACE/audit_core.py"
-      - run: python -m pytest tests -q
+      - name: Offline checks that do not call a model
+        run: |
+          python tests/test_detector.py
+          python tests/test_analysis.py
+          python scripts/check_readme_drift.py
+          python scripts/check_fixtures.py
+          python scripts/check_integrity.py
+          python -m pytest tests -q
