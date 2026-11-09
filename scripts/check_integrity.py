@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -23,10 +24,22 @@ from pathlib import Path
 
 PKG = Path(__file__).resolve().parents[1]
 
-R3_WORKSPACE = (
-    Path.home()
-    / "arxiv-publication/papers/approval-gates-r3/evidence/supplement/workspace/approval/supplement-20261014"
-)
+def default_workspace() -> Path:
+    """Same discovery order as ``r5.runner.r3_candidates`` for the env var.
+
+    ``--workspace`` still wins. When ``R5_R3_WORKSPACE`` is unset, the historical
+    home-directory checkout remains the default.
+    """
+    explicit = os.environ.get("R5_R3_WORKSPACE", "").strip()
+    if explicit:
+        return Path(explicit).expanduser()
+    return (
+        Path.home()
+        / "arxiv-publication/papers/approval-gates-r3/evidence/supplement/workspace/approval/supplement-20261014"
+    )
+
+
+R3_WORKSPACE = default_workspace()
 
 # Carried forward from R3 evidence/supplement/summary.json (e03, evaluation).
 PUBLISHED = {
@@ -55,7 +68,10 @@ def main() -> int:
     verify = a.workspace / "verify_effects.py"
     if not audit.exists() or not verify.exists():
         print(f"PREREQ MISSING: {a.workspace}", file=sys.stderr)
-        print("Set --workspace to the R3 supplement workspace.", file=sys.stderr)
+        print(
+            "Set R5_R3_WORKSPACE or --workspace to the R3 supplement workspace.",
+            file=sys.stderr,
+        )
         return 2
 
     base = Path(tempfile.mkdtemp(prefix="r5-integrity-"))
