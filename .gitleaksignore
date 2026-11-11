@@ -1,0 +1,17 @@
+# Known false positives: vendored test fixtures / evidence JSON (gitleaks generic-api-key, github-pat)
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:404
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:411
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:418
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:425
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:432
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:439
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:446
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:453
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:509
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:537
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:551
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:558
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:565
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:579
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:586
+52c5764c56e97927c41a5dadade2d83311492251:results/claims.json:generic-api-key:593
