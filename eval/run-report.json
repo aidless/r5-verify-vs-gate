@@ -1,0 +1,129 @@
+{
+ "total": 20,
+ "passed": 20,
+ "failed": 0,
+ "selftest": false,
+ "failed_by_axis": {},
+ "results": [
+  {
+   "id": "RV-01",
+   "axis": "detector/acceptance",
+   "ok": true,
+   "detail": "True"
+  },
+  {
+   "id": "RV-02",
+   "axis": "detector/acceptance",
+   "ok": true,
+   "detail": "acceptance"
+  },
+  {
+   "id": "RV-03",
+   "axis": "detector/acceptance",
+   "ok": true,
+   "detail": "rejection"
+  },
+  {
+   "id": "RV-04",
+   "axis": "detector/rejection",
+   "ok": true,
+   "detail": "False"
+  },
+  {
+   "id": "RV-05",
+   "axis": "detector/rejection",
+   "ok": true,
+   "detail": "rejection"
+  },
+  {
+   "id": "RV-06",
+   "axis": "detector/rejection",
+   "ok": true,
+   "detail": "False"
+  },
+  {
+   "id": "RV-07",
+   "axis": "detector/intent",
+   "ok": true,
+   "detail": "False"
+  },
+  {
+   "id": "RV-08",
+   "axis": "detector/intent",
+   "ok": true,
+   "detail": "False"
+  },
+  {
+   "id": "RV-09",
+   "axis": "analysis/summarize",
+   "ok": true,
+   "detail": "1"
+  },
+  {
+   "id": "RV-10",
+   "axis": "analysis/summarize",
+   "ok": true,
+   "detail": "1"
+  },
+  {
+   "id": "RV-11",
+   "axis": "analysis/summarize",
+   "ok": true,
+   "detail": "0.5"
+  },
+  {
+   "id": "RV-12",
+   "axis": "analysis/decide",
+   "ok": true,
+   "detail": "divergent"
+  },
+  {
+   "id": "RV-13",
+   "axis": "analysis/decide",
+   "ok": true,
+   "detail": "aligned_but_costly"
+  },
+  {
+   "id": "RV-14",
+   "axis": "analysis/decide",
+   "ok": true,
+   "detail": "indeterminate"
+  },
+  {
+   "id": "RV-15",
+   "axis": "runner/arms",
+   "ok": true,
+   "detail": "allow_all"
+  },
+  {
+   "id": "RV-16",
+   "axis": "runner/arms",
+   "ok": true,
+   "detail": "True"
+  },
+  {
+   "id": "RV-17",
+   "axis": "runner/arms",
+   "ok": true,
+   "detail": "True"
+  },
+  {
+   "id": "RV-18",
+   "axis": "runner/errors",
+   "ok": true,
+   "detail": "raised UnsupportedSwitch"
+  },
+  {
+   "id": "RV-19",
+   "axis": "runner/errors",
+   "ok": true,
+   "detail": "raised KeyError"
+  },
+  {
+   "id": "RV-20",
+   "axis": "results/data",
+   "ok": true,
+   "detail": "1"
+  }
+ ]
+}

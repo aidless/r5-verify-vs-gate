@@ -59,6 +59,45 @@ also a proxy. Whether it diverges is empirical, and this package measures it.
 
 ---
 
+## Acceptance criteria (what counts as passing)
+
+**Acceptance criteria — this repo passes only if all four hold.** A change is accepted
+only when `python3 eval/run_cases.py` reports 20/20 cases passed (100%, `n = 20`),
+`python3 -m pytest tests -q` reports 27 passed with 0 failed, `python3
+scripts/check_integrity.py` prints `RESULT: EXACT REPRODUCTION` over `n = 540`
+constructed cells, and `python3 eval/run_cases.py --selftest` reports 19/20 — the last
+one is required to go red, so a full green there means the suite is decorative. Any
+single failing row is a failed acceptance, not a partial pass: there is no "mostly
+green".
+
+| # | Command | Threshold (must hold, exit code in brackets) |
+|---|---|---|
+| 1 | `python3 eval/run_cases.py` | **20/20** cases pass — 100%, `n = 20` cases [0] |
+| 2 | `python3 -m pytest tests -q` | **27 passed**, 0 failed [0] |
+| 3 | `python3 scripts/check_integrity.py` | prints `RESULT: EXACT REPRODUCTION` over `n = 540` constructed cells [0] |
+| 4 | `python3 eval/run_cases.py --selftest` | **19/20** [0] — the suite MUST go red when one expected value is corrupted; a full green here means the suite is decorative |
+
+`make eval` runs rows 1 and 2 in one command. The 20 cases are not a README in
+table form: at least 12 of them execute this repository's own API (`r5.detect`,
+`r5.summarize`, `r5.decide`, `build_system`, `switch_kwargs`, `MockBackend`) or parse
+an archived artifact, and every `expected` was computed from a real run before it was
+written down. Changing one line of `r5/analysis.py` or `r5/assertion_detector.py` is
+expected to turn rows red — that is the point of rows 1 and 4.
+
+### Cost and wall-clock (measured, 2026-11-13, this machine)
+
+| Command | Wall clock | Note |
+|---|---|---|
+| `python3 eval/run_cases.py` | 0.11–0.14 s (3 runs) | 20 cases, stdlib only, no network |
+| `python3 -m pytest tests -q` | 1.40 s wall (pytest reports 0.70 s) | 27 tests |
+| `python3 scripts/check_integrity.py` | 3.54 s wall | rebuilds the 540-cell matrix in a temp dir |
+
+Model-arm cost is measured per arm, not estimated, and is already in the tables below
+as output tokens: `results/arm_a/summary.json:arms.arm_a.output_tokens = 555` and
+`results/arm_b/summary.json:arms.arm_b.output_tokens = 2748` for llama3.2:3b. No paid
+API is called anywhere in this repo; the only external dependency for a real model
+arm is a local ollama endpoint.
+
 ## What is here
 
 | Path | What it is | Status |
@@ -238,6 +277,61 @@ running `scripts/run_arm.py` / `scripts/run_temptation.py` against a real ollama
 endpoint (requires the R3 supplement workspace; see Prerequisites). The archived
 artifacts under `results/`, `results-tempt-v3/`, `results-tempt-v4/` are the
 authoritative records and are what `emit_numbers.py` reads.
+
+## Failure attribution (failure taxonomy by axis)
+
+This repo never reports a bare `pass_rate`. `eval/run_cases.py` groups every failure
+by axis and `--save` writes that grouping to `eval/run-report.json`; the current file
+is `{"total": 20, "passed": 20, "failed": 0, "failed_by_axis": {}}`. A red row names
+the module to look at instead of leaving you to bisect the package:
+
+| axis | cases | module a failure is attributed to |
+|---|---|---|
+| `detector/acceptance` | RV-01 … RV-03 | `r5/assertion_detector.py:162` `detect()` acceptance path |
+| `detector/rejection` | RV-04 … RV-06 | `_NEGATED_RE` + rejection precedence, `r5/assertion_detector.py:188` |
+| `detector/intent` | RV-07 … RV-08 | `_INTENT` exclusion of bare restatement, `r5/assertion_detector.py:86` |
+| `analysis/summarize` | RV-09 … RV-11 | `r5/analysis.py:93` `summarize()` counters |
+| `analysis/decide` | RV-12 … RV-14 | `r5/analysis.py:193` `decide()` pre-registered branches |
+| `runner/arms` | RV-15 … RV-17 | `r5/runner.py:291` `ARMS` table / `switch_kwargs` |
+| `runner/errors` | RV-18 … RV-19 | `Backend.check_switch`, `r5/runner.py:83` |
+| `results/data` | RV-20 | archived artifact `results-tempt-v4/llama3.2/arm_a/summary.json` |
+
+Three failure classes that actually occurred here, each with the module it blamed —
+these are the reason the axes are cut this way:
+
+1. **Format collapse (parse path, not the gate).** llama3.2:3b arms B and D in
+   `results-tempt-v3/`: `unparseable = 27` of 27 scenarios, i.e. the model never
+   closed its JSON. Blame `scripts/run_arm.py`'s parse stage; the zero-effects count
+   in those cells is a parsing artefact, not containment.
+2. **Permission exceeded (gate path).** qwen2.5:7b arm A in the same run:
+   `unauthorized_effects = 10` with `proxy_positive = 0`. Blame the `allow_all` gate
+   configuration, not the detector — nothing was asserted, so no assertion could be
+   wrong. This is why `silent_act` is counted separately in `r5/analysis.py`.
+3. **Eval-harness path resolution (the harness, not the science).** RV-20 failed on
+   its first run with `TypeError: argument should be a str or an os.PathLike object …
+   not 'NoneType'`, because `r5/` is a namespace package and `r5.__file__` is `None`.
+   Attribution pointed at the case's path resolution (`r5.assertion_detector.__file__`
+   instead), not at the analysis code — which is the behaviour the axis exists for.
+
+## What is ours and what is cited (citation boundary)
+
+- **Cited / adapted.** The upstream work named in
+  [`PROTOCOL_R5.md`](PROTOCOL_R5.md) (`arXiv:2610.28578`) is the source the
+  model-internal verification question is `based on`; the framing of the four
+  decision branches follows that paper rather than being invented here. The R3
+  local-effect core (`audit_core.py`, `verify_effects.py`) is reused unchanged from
+  the approval-gates R3 supplement.
+- **本仓自己的.** Every table, cell count, token number and detector score in this
+  README is this repository's own measurement, produced by the commands listed above
+  from artifacts under `results*/`. No number is copied from another paper.
+- **非原图.** The figures under `paper/` are `our own` renderings, generated by
+  `emit_numbers.py` from `results/claims.json`; they are not reproduced from any
+  external source, and `audit_numbers.py` fails if a manuscript number cannot be
+  traced back to that ledger (`source:` path + field per claim in
+  [`CLAIM_LEDGER.md`](CLAIM_LEDGER.md)).
+- Anything in the "does *not* prove" list above is deliberately marked out of scope
+  rather than claimed: no defense property, no population rate, no trained-verification
+  capability result.
 
 ## The paper
 
