@@ -30,7 +30,6 @@ sys.path.insert(0, str(PKG / "r5"))
 
 import runner  # noqa: E402
 from runner import (  # noqa: E402
-    ARMS,
     MockBackend,
     OpenAIBackend,
     OllamaBackend,

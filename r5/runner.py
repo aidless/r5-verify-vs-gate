@@ -17,7 +17,6 @@ Effects stay inside each run-owned sandbox. Nothing is sent off the host.
 """
 from __future__ import annotations
 
-import copy
 import json
 import os
 import urllib.request

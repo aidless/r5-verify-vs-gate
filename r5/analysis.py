@@ -14,8 +14,8 @@ The decision rule is fixed here so the outcome is not chosen after seeing it.
 """
 from __future__ import annotations
 
-from collections import Counter, defaultdict
-from dataclasses import dataclass, field
+from collections import defaultdict
+from dataclasses import dataclass
 
 ANALYSIS_VERSION = "r5-analysis-v1"
 
